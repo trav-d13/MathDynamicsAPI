@@ -12,6 +12,16 @@ A mathematical pattern API generator, returning patterns in GIF format... suitab
 2. Create the Docker container `docker build -t math_dynamics`
 3. Run the docker container `docker run -p 8000:8000 math_dynamics`
 
+## Testing
+This project utilizes Pytest as the testing library. All tests are required to pass before a branch can be merged. 
+
+When running tests locally, please ensure your Python path is set to the project root directory. In linux, the following command will do this: `export PYTHONPATH=$(pwd)`
+
+The following actions and commands relating to the tests are useful:
+- `pytest` Executes the entire test set
+- `pytest -s` Executes pytests printing console outputs
+- `pytest -vv` Executes test by test, specifying when one passes/ fails.  
+
 ## Notebooks
 In order to explore more pattern, or try out different versions please use the `notebooks/` directory. 
 In order to create a suitable environment containing all dependencies, please follow the below steps:
