@@ -1,0 +1,24 @@
+site_name: MathDynamicsAPI Docs
+site_url: https://mydomain.org/mysite
+theme:
+  name: material
+
+nav:
+  - Home: index.md
+  - API Endpoints: endpoints.md
+  - Mandelbrot Set: mandelbrot.md
+
+
+plugins:
+- search
+- mkdocstrings:
+    default_handler: python
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
