@@ -24,6 +24,20 @@ def mandelbrot(c, max_iteration):
     return max_iteration  # Pattern still bound, returning max iteration
 
 def mandelbrot_iteration_generation(width: int, height: int, max_iterations: int, colour: str):
+    """ Generate a Mandelbrot GIF, based on successive maximum iterations to reveal a finer pattern corresponding to higher
+    maximum iteration scores
+
+    The method will generate successive Mandelbrot frames, using a range of iteration values from 2-`max_iteration` in steps of 10.
+
+    Parameters:
+        width (int): The width of the complex number (c) grid. This can be thought of as the width of the returned gif.
+        height (int): The height of the complex number (c) grid. This can be thought of as the height of the returned gif.
+        max_iterations (int): The maximum iteration value
+        colour (string): Specify the colour to be used for visualization. Colours available correspond to [matplotlib colourmaps](https://matplotlib.org/stable/users/explain/colors/colormaps.html)
+
+    Returns:
+        (os.path): The file path to the newly created mandelbrot gif resource. 
+    """
     frames = []  # Store the frames
 
     for i in range(2, max_iterations + 1, 10):  # generate number of frames (steps of 5)
@@ -36,6 +50,19 @@ def mandelbrot_iteration_generation(width: int, height: int, max_iterations: int
 
 
 def mandelbrot_frame(width: int, height: int, iteration: int, max_iteration: int):
+    """Create a Mandelbrot frame based on the specified iteration value. 
+
+    This generates a single frame that will be included within the complete gif. 
+
+    Parameters:
+        width (int): The width of the complex number (c) grid. This can be thought of as the width of the returned gif.
+        height (int): The height of the complex number (c) grid. This can be thought of as the height of the returned gif.
+        iteration (int): The current maximum iteration value under consideration. 
+        max_iteration (int): The maximum iteration value.
+
+    Returns:
+        (np.matrix): A numpy array containing a single frame of the Mandelbrot set.
+    """
     img = np.zeros((width, height))  # Create a blank image 
 
     for x in range(width):  # Iterate through frame grid
@@ -49,6 +76,18 @@ def mandelbrot_frame(width: int, height: int, iteration: int, max_iteration: int
     return img
 
 def save_frame(frames_store: list, img: np.matrix, iteration: int, colour: str):
+    """Saving a numpy matrix frame into an image frame to be used when creating the Mandelbrot gif. 
+
+    Frame is saved in a temporary folder, such that its memory is volatile. 
+
+    The method returns no value, as the list is passed by reference.
+
+    Parameters:
+        frames_store (list): A list containing the frames that will make up the gif. 
+        img (np.matrix): The current frame as a matrix to be transformed into an image
+        iteration (int): The current maximum iteration value under consideration. This is the value used to generate the frame parameter.
+        colour (string): Specify the colour to be used for visualization. Colours available correspond to [matplotlib colourmaps](https://matplotlib.org/stable/users/explain/colors/colormaps.html)
+    """
     fig, ax = plt.subplots()  # Create and save the current frame
     ax.imshow(img, extent=[-2, 0.5, -1.25, 1.25], cmap=colour)  # Setting visual limits
     ax.axis('off')  # Hide axes
