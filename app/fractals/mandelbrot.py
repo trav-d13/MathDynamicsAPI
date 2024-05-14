@@ -6,7 +6,7 @@ import imageio
 
 resource_path = 'app/resources/'
 
-def mandelbrot(c, max_iteration):
+def mandelbrot_calc(c, max_iteration):
     """Mandelbrot calculation to return the iteration at which the pattern becomes unbound, or achieves the max iteration.
     
     Parameters:
@@ -69,7 +69,7 @@ def mandelbrot_frame(width: int, height: int, iteration: int, max_iteration: int
         for y in range(height):
 
             c = complex(-2 + 2.5 * x / width, -1.25 + 2.5 * y / height)  # Convert pixel coordinate to complex number
-            m = mandelbrot(c, iteration)  # Compute the number of iterations
+            m = mandelbrot_calc(c, iteration)  # Compute the number of iterations
             color = 255 - int(m * 255 / max_iteration)  # Color depends on the number of iterations
             img[y, x] = color # Add value to the frame
 
