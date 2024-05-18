@@ -7,6 +7,7 @@ from sqlmodel import SQLModel, Field
 import secrets
 
 from app.models import CreateUser
+from sqlalchemy.future import select
 
 
 async_engine: AsyncEngine = create_async_engine(
@@ -15,24 +16,31 @@ async_engine: AsyncEngine = create_async_engine(
     future=True
 )
 
-async_session = sessionmaker(
-    async_engine,
-    expire_on_commit=False,
-    class_=AsyncSession
-)
-
 async def init_db():
     async with async_engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)
 
 async def get_session():
-    from sqlmodel.ext.asyncio.session import AsyncSession
-    async_session = AsyncSession(bind=async_engine, expire_on_commit=False)
+    async_session = sessionmaker(
+       bind=async_engine, class_=AsyncSession, expire_on_commit=False
+    )
     async with async_session() as session:
         yield session
 
-async def create_user(session: Session, user_data: CreateUser):
-    pass
+async def fetch_or_create_user_key(session: Session, user_data: CreateUser):
+    result = await session.execute(select(User).where(User.email == user_data.email))  # Query to check if the user already exists
+    existing_user = result.scalars().first()
+
+    if existing_user:
+        return existing_user.api_key  # Return the existing user id if found
+    else:  # If the user does not exist, create a new user
+        new_user = User(name=user_data.name,
+                        email=user_data.email,
+                        location=user_data.country,
+                        api_key=User.generate_api_key())
+        session.add(new_user)
+        await session.commit()  # save changes to the database
+        return new_user.api_key  # Return the api key
 
 
 

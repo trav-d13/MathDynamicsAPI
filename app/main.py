@@ -10,11 +10,10 @@ from slowapi.util import get_remote_address
 
 # Database
 from sqlmodel import Session, select
-from app.database import get_session, init_db, User
+from app.database import get_session, init_db, User, fetch_or_create_user_key
 
 # Models
 from app.models import CreateUser
-import os
 
 # Fractals
 from app.fractals.mandelbrot import mandelbrot_iteration_generation
@@ -27,7 +26,6 @@ limiter = Limiter(key_func=get_remote_address)
 @asynccontextmanager
 async def lifespan(app: FastAPI):  # Initialize database structure
     await init_db()  # Initialize the database at startup
-    print("Database initialized")
 
     yield  # Control returns to FastAPI to run normally
 
@@ -44,11 +42,10 @@ async def root():
     return {"message": "Hello World"}
 
 
-@app.get("/api_key")
+@app.post("/api_key")
 async def generate_api_key(user_data: CreateUser, session: Session = Depends(get_session)):
-    # TODO Create new user
-    # TODO return API key to user
-    pass
+    key = await fetch_or_create_user_key(session=session, user_data=user_data)
+    return {"api_key": key}
 
 
 @app.get("/mandelbrot")
