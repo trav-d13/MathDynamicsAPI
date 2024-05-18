@@ -14,7 +14,7 @@ def mandelbrot_calc(c, max_iteration):
         max_iteration (int): The maximum iteraton to consider for the mandelbrot set
 
     Returns:
-        (int): The numer of iterations until the pattern becomes unbound (or the max_iterations)
+        (int): The number of iterations until the pattern becomes unbound (or the max_iterations)
     """
     z = c
     for n in range(max_iteration):
