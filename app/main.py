@@ -3,9 +3,6 @@ from fastapi import FastAPI, Request, Depends
 from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 
-# Endpoint Models
-from pydantic import BaseModel, EmailStr
-
 # Rate Limiting
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -13,8 +10,11 @@ from slowapi.util import get_remote_address
 
 # Database
 from sqlmodel import Session, select
-from database import get_session, init_db
-from models import User
+from app.database import get_session, init_db, User
+
+# Models
+from app.models import CreateUser
+import os
 
 # Fractals
 from app.fractals.mandelbrot import mandelbrot_iteration_generation
@@ -23,25 +23,20 @@ limiter = Limiter(key_func=get_remote_address)
 
 # TODO Include environmental variable that will void API key checks to allow for local development
 
-app = FastAPI()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):  # Initialize database structure
     await init_db()  # Initialize the database at startup
+    print("Database initialized")
+
     yield  # Control returns to FastAPI to run normally
 
-app.router.lifespan_handler = lifespan
+
+app = FastAPI(lifespan=lifespan)
 
 # Link limiter to FastAPI
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-
-# Data Models
-class CreateUser(BaseModel):
-    name: str
-    email: EmailStr
-    country: str #TODO Add validator to check Country is valid
-
 
 
 @app.get("/")
