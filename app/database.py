@@ -8,6 +8,7 @@ import secrets
 
 from app.models import CreateUser
 from sqlalchemy.future import select
+from sqlalchemy import func
 
 
 async_engine: AsyncEngine = create_async_engine(
@@ -68,6 +69,24 @@ async def fetch_or_create_user_key(session: Session, user_data: CreateUser):
         session.add(new_user)
         await session.commit()  # save changes to the database
         return new_user.api_key  # Return the api key
+    
+
+async def validate_key(session: Session, api_key: str):
+    """
+    Validate an API key by checking its existence in the User table.
+
+    Parameters:
+      session (Session): The database session to use for the query.
+      api_key (str): The API key to be validated.
+
+    Returns:
+      bool: True if the API key exists, False otherwise.
+    """
+    result = await session.execute(select(User).where(User.api_key == api_key))  # Retrieve record of associated user
+    key_match = result.scalar_one_or_none()
+    if key_match is None:
+        return False
+    return True
 
 
 
@@ -99,4 +118,4 @@ class User(SQLModel, table=True):
         Returns:
             str: A newly generated URL-safe API key.
         """
-        return secrets.token_urlsafe(32)
+        return secrets.token_urlsafe(64)
