@@ -93,16 +93,10 @@ async def mandelbrot_set(request: Request, width: int, height: int, max_iteratio
         (FileResponse): A file response of file type `.gif`
     """
     if explanation:
-        text = (
-                "The Mandelbrot set is a set of complex numbers that produces a fractal when plotted. "
-                "This set is named after Benoit B. Mandelbrot, who studied and popularized it in 1980. "
-                "The boundary of the Mandelbrot set forms a complex and infinitely detailed fractal shape."
-            )
         mandelbrot_iter_gif_path = mandelbrot_iteration_generation_with_text(width=width,
                                                           height=height,
                                                           max_iterations=max_iterations,
-                                                          colour=colour,
-                                                          text=text)
+                                                          colour=colour)
     else:
         mandelbrot_iter_gif_path = mandelbrot_iteration_generation(width=width,
                                                           height=height,

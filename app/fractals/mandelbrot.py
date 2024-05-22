@@ -6,6 +6,8 @@ import imageio
 from PIL import Image, ImageDraw, ImageFont
 import textwrap
 
+from app.text_info import create_text_image, Explanations
+
 resource_path = 'app/resources/'
 
 def mandelbrot_calc(c, max_iteration):
@@ -50,29 +52,26 @@ def mandelbrot_iteration_generation(width: int, height: int, max_iterations: int
     imageio.mimsave(file_name, frames, fps=1, loop=0)  # Generate GIF
     return file_name
 
-def mandelbrot_iteration_generation_with_text(width: int, height: int, max_iterations: int, colour: str, text: str):
+def mandelbrot_iteration_generation_with_text(width: int, height: int, max_iterations: int, colour: str):
     mandelbrot_gif_path = mandelbrot_iteration_generation(width, height, max_iterations, colour)
     gif = Image.open(mandelbrot_gif_path)  # Load the gif
 
     text_width = 300
-    text_height = gif.height
-    text_image = create_text_image(text=text, width=text_width, height=text_height)  # Generate the text image
+    text_height = gif.height  # Extract height to match text image with GIF
+    text_image = create_text_image(width=text_width, height=text_height, explanation=Explanations.MANDELBROT_ITERATIVE)  # Generate the text image
 
     frames = []
     try:
         while True:
-            # Create a new image with the combined width
-            combined_width = gif.width + text_width
+            combined_width = gif.width + text_width  # Create a new image with the combined width
             combined_image = Image.new("RGB", (combined_width, gif.height), "white")
 
-            # Paste the GIF and text image onto the combined image
-            combined_image.paste(gif, (0, 0))
+            combined_image.paste(gif, (0, 0))  # Paste the GIF and text image onto the combined image
             combined_image.paste(text_image, (gif.width, 0))
 
             frames.append(combined_image)
 
-            # Move to the next frame
-            gif.seek(gif.tell() + 1)
+            gif.seek(gif.tell() + 1)  # Move to the next frame
     except EOFError:
         pass  # End of sequence
 
@@ -80,23 +79,6 @@ def mandelbrot_iteration_generation_with_text(width: int, height: int, max_itera
     file_name = os.path.join(resource_path, f'mandelbrot_iter_{width}_{height}_{max_iterations}_{colour}_text.gif')
     frames[0].save(file_name, save_all=True, append_images=frames[1:], loop=0, duration=gif.info['duration'])
     return file_name
-
-def create_text_image(text: str, width: int, height: int) -> Image.Image:
-    # Create a new image with a white background
-    text_image = Image.new("RGB", (width, height), "white")
-    draw = ImageDraw.Draw(text_image)
-    font = ImageFont.load_default()
-
-    # Define text wrapping
-    lines = textwrap.wrap(text, width=40)
-    y_text = 10  # Starting Y position for the text
-
-    # Draw the text on the image
-    for line in lines:
-        draw.text((10, y_text), line, font=font, fill="black")
-        y_text += 15  # Adjust line spacing
-
-    return text_image
 
 
 def mandelbrot_frame(width: int, height: int, iteration: int, max_iteration: int):
