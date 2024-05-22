@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 import tempfile
 import os
 import imageio
+from PIL import Image, ImageDraw, ImageFont
+import textwrap
+
+from app.text_info import create_text_image, Explanations
 
 resource_path = 'app/resources/'
 
@@ -14,7 +18,7 @@ def mandelbrot_calc(c, max_iteration):
         max_iteration (int): The maximum iteraton to consider for the mandelbrot set
 
     Returns:
-        (int): The numer of iterations until the pattern becomes unbound (or the max_iterations)
+        (int): The number of iterations until the pattern becomes unbound (or the max_iterations)
     """
     z = c
     for n in range(max_iteration):
@@ -46,6 +50,34 @@ def mandelbrot_iteration_generation(width: int, height: int, max_iterations: int
     
     file_name = os.path.join(resource_path, f'mandelbrot_iter_{width}_{height}_{max_iterations}_{colour}.gif')
     imageio.mimsave(file_name, frames, fps=1, loop=0)  # Generate GIF
+    return file_name
+
+def mandelbrot_iteration_generation_with_text(width: int, height: int, max_iterations: int, colour: str):
+    mandelbrot_gif_path = mandelbrot_iteration_generation(width, height, max_iterations, colour)
+    gif = Image.open(mandelbrot_gif_path)  # Load the gif
+
+    text_width = 300
+    text_height = gif.height  # Extract height to match text image with GIF
+    text_image = create_text_image(width=text_width, height=text_height, explanation=Explanations.MANDELBROT_ITERATIVE)  # Generate the text image
+
+    frames = []
+    try:
+        while True:
+            combined_width = gif.width + text_width  # Create a new image with the combined width
+            combined_image = Image.new("RGB", (combined_width, gif.height), "white")
+
+            combined_image.paste(gif, (0, 0))  # Paste the GIF and text image onto the combined image
+            combined_image.paste(text_image, (gif.width, 0))
+
+            frames.append(combined_image)
+
+            gif.seek(gif.tell() + 1)  # Move to the next frame
+    except EOFError:
+        pass  # End of sequence
+
+    # Save the combined frames as a new GIF
+    file_name = os.path.join(resource_path, f'mandelbrot_iter_{width}_{height}_{max_iterations}_{colour}_text.gif')
+    frames[0].save(file_name, save_all=True, append_images=frames[1:], loop=0, duration=gif.info['duration'])
     return file_name
 
 

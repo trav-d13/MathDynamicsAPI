@@ -6,3 +6,4 @@ These documents capture the underlying code and computational elements of the AP
 ## Topics and Docs
 - ### [API Endpoints](endpoints.md)
 - ### [Mandelbrot Set](mandelbrot.md)
+- ### [Database Interaction](database.md)
