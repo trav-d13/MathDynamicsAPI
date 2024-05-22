@@ -13,7 +13,7 @@ from sqlalchemy import func
 
 async_engine: AsyncEngine = create_async_engine(
     os.getenv('DB_URI'),
-    echo=True,
+    echo=False,
     future=True
 )
 
